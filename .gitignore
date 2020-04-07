@@ -1,2 +1,12 @@
 /cache/
 /config/development/
+.idea
+vendor
+composer.phar
+composer.lock
+stack.md
+php-cs-fixer
+phpcbf.phar
+phpcs.phar
+PHP_CodeSniffer
+.php_cs.cache

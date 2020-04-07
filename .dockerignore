@@ -1,0 +1,8 @@
+stack.md
+composer.phar
+src/vendor
+src/composer.lock
+PHP_CodeSniffer
+phpcbf.phar
+phpcs.phar
+php-cs-fixer

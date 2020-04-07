@@ -1,0 +1,11 @@
+<?php
+putenv("QUEUE_HOST=beans");
+putenv("OAUTH_CLIENT_ID=notify");
+putenv("OAUTH_CLIENT_SECRET=teknasyon");
+putenv("OAUTH_TOKEN_URL=http://api/oauth2/token");
+putenv("OAUTH_CLIENT_SCOPE=");
+putenv("API_BASE_URL=http://api");
+putenv("NOTIFY_HOUR=09:00");
+putenv("OAUTH_CLIENT_REDIRECT_URL=");
+putenv("OAUTH_CLIENT_AUTHORIZE_URL=http://api/oauth2/authorize");
+putenv("OAUTH_OWNER_DETAILS=http://api/oauth2/me");
