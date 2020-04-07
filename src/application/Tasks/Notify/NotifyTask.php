@@ -18,17 +18,17 @@ class NotifyTask extends Task
     /**
      * @param array $params
      * @param Job   $job
-     * @param null  $logger
      *
      * @return bool
      */
-    public function sendMobilePushAction(array $params, Job $job, $logger = null)
+    public function sendMobilePushAction(array $params, Job $job)
     {
         $this->job = $job;
         try {
             $status = $this->isSent($params['user_id']);
             if ($status['mobile'] === false) {
-                $this->log('Sending mobile push notification to ' . $params['email']);
+                $this->log('Sending mobile push to ' . $params['email']. ' 
+                for these cities: '.json_encode($params['city']));
                 $this->markSent($params['user_id'], 'mobile');
             } else {
                 $this->log('Already sent mobile push to ' . $params['email']);
@@ -43,17 +43,17 @@ class NotifyTask extends Task
     /**
      * @param array $params
      * @param Job   $job
-     * @param null  $logger
      *
      * @return bool
      */
-    public function sendMailAction(array $params, Job $job, $logger = null)
+    public function sendMailAction(array $params, Job $job)
     {
         $this->job = $job;
         try {
             $status = $this->isSent($params['user_id']);
             if ($status['email'] === false) {
-                $this->log('Sending email to ' . $params['email']);
+                $this->log('Sending email to ' . $params['email']. ' 
+                for these cities: '.json_encode($params['city']));
                 $this->markSent($params['user_id'], 'email');
             } else {
                 $this->log('Already sent email to ' . $params['email']);
@@ -68,11 +68,10 @@ class NotifyTask extends Task
     /**
      * @param array $params
      * @param Job   $job
-     * @param null  $logger
      *
      * @return bool
      */
-    public function subscriberAction(array $params, Job $job, $logger = null)
+    public function subscriberAction(array $params, Job $job)
     {
         $this->job = $job;
         $this->log('Task in progress');
@@ -159,6 +158,7 @@ class NotifyTask extends Task
      * @param int             $limit
      *
      * @return array
+     * @throws Exception
      */
     protected function getUsers(GenericProvider $client, $token, array $params, int $offset = 0, int $limit = 2): array
     {
@@ -179,7 +179,7 @@ class NotifyTask extends Task
         $response = $client->getParsedResponse($request);
 
         if ($response['code'] == 400) {
-            throw new \Exception($response['detail']);
+            throw new Exception($response['detail']);
         }
 
         return $response;
