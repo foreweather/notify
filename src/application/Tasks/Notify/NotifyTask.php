@@ -162,7 +162,7 @@ class NotifyTask extends Task
      */
     protected function getUsers(GenericProvider $client, $token, array $params, int $offset = 0, int $limit = 2): array
     {
-        $options['field']  = 'user_id,email,onesignal_id,city_id';
+        $options['field']  = 'user_id,email,onesignal_id,city';
         $options['limit']  = $limit;
         $options['offset'] = $offset;
         foreach ($params as $key => $param) {
