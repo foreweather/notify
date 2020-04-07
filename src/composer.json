@@ -21,7 +21,8 @@
     "ext-json": "*",
     "ext-phalcon": "~4.0.5",
     "pda/pheanstalk": "4.0.1",
-    "league/oauth2-client": "2.2.*"
+    "league/oauth2-client": "2.2.*",
+    "monolog/monolog": "2.0.2"
   },
   "require-dev": {
     "phalcon/ide-stubs": "4.0.4"
