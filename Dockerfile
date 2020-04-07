@@ -25,6 +25,16 @@ RUN apk --update add bash git curl php7-fpm php7-phalcon php7-phar php7-openssl 
                  && rm -rf /var/cache/apk/*
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
+########################################################################################################################
+## PHP Settings
+########################################################################################################################
+RUN    	sed -i "s|;*date.timezone =.*|date.timezone = ${TIMEZONE}|i" /etc/php7/php.ini && \
+    	sed -i "s|;*memory_limit =.*|memory_limit = ${PHP_MEMORY_LIMIT}|i" /etc/php7/php.ini && \
+        sed -i "s|;*upload_max_filesize =.*|upload_max_filesize = ${MAX_UPLOAD}|i" /etc/php7/php.ini && \
+        sed -i "s|;*max_file_uploads =.*|max_file_uploads = ${PHP_MAX_FILE_UPLOAD}|i" /etc/php7/php.ini && \
+        sed -i "s|;*post_max_size =.*|post_max_size = ${PHP_MAX_POST}|i" /etc/php7/php.ini && \
+        sed -i "s|;*cgi.fix_pathinfo=.*|cgi.fix_pathinfo= 0|i" /etc/php7/php.ini
+
 RUN echo short_open_tag = On >> /etc/php7/php.ini
 RUN mkdir -p /etc/php7/fpm.d/ && touch /etc/php7/fpm.d/default.conf && mkdir -p /www
 
