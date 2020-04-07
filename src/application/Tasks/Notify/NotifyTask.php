@@ -178,7 +178,9 @@ class NotifyTask extends Task
 
         $response = $client->getParsedResponse($request);
 
-        var_dump($response);
+        if ($response['code'] == 400) {
+            throw new \Exception($response['detail']);
+        }
 
         return $response;
     }
