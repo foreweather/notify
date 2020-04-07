@@ -144,7 +144,7 @@ class Notify
 
     public function run(): void
     {
-        $this->console('Worker is running!');
+        $this->console('Notify is running!');
         while (true) {
             try {
                 $this->job = $this->queue->reserveWithTimeout(10);
