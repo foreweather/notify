@@ -168,6 +168,7 @@ class NotifyTask extends Task
         foreach ($params as $key => $param) {
             $options['filter']['timezone'][] = $param;
         }
+        $options['filter']['status'] = 'active';
 
         $request = $client->getAuthenticatedRequest(
             'GET',
@@ -176,6 +177,8 @@ class NotifyTask extends Task
         );
 
         $response = $client->getParsedResponse($request);
+
+        var_dump($response);
 
         return $response;
     }
