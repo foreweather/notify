@@ -7,6 +7,7 @@ use League\OAuth2\Client\Provider\GenericProvider;
 use Phalcon\Cli\Task;
 use Phalcon\Logger;
 use Pheanstalk\Job;
+use Pheanstalk\Pheanstalk;
 
 class NotifyTask extends Task
 {
@@ -81,6 +82,10 @@ class NotifyTask extends Task
              */
             $client = $this->di->get('oauth_client');
             $token  = $client->getAccessToken('client_credentials');
+
+            /**
+             * @var Pheanstalk $queue
+             */
             $queue  = $this->getDI()->get('queue');
 
             $collection   = $this->getUsers($client, $token, $params);
@@ -108,7 +113,6 @@ class NotifyTask extends Task
                             'payload' => $user,
                         ]
                     );
-
                     $queue->useTube('email')->put($data);
                     $this->log('Daily email push task registered for ' . $user['email']);
                 }
