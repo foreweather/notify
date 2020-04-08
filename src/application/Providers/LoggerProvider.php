@@ -24,7 +24,6 @@ class LoggerProvider implements ServiceProviderInterface
 
     public function register(DiInterface $di): void
     {
-
         $di->setShared(
             'logger',
             function () {
@@ -67,6 +66,7 @@ class LoggerProvider implements ServiceProviderInterface
                 $logger = new Logger('notify-logger');
                 $logger->pushHandler($sys_log);
                 $logger->pushHandler($stream_handler);
+                $logger->pushHandler(new StreamHandler('php://stdout', Logger::WARNING));
 
                 return $logger;
             }
