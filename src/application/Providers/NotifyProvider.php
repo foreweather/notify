@@ -20,9 +20,11 @@ class NotifyProvider implements ServiceProviderInterface
     {
         $di->setShared(
             'notify',
-            function () {
-                //echo 'NotifyTask instance created' . PHP_EOL;
-                return new NotifyTask();
+            function () use ($di) {
+
+                $notify = new NotifyTask();
+                $notify->setLogger($di->getShared('logger'));
+                return $notify;
             }
         );
     }

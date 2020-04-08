@@ -4,8 +4,8 @@ namespace Tasks\Notify;
 
 use Exception;
 use League\OAuth2\Client\Provider\GenericProvider;
+use Monolog\Logger;
 use Phalcon\Cli\Task;
-use Phalcon\Logger;
 use Pheanstalk\Job;
 use Pheanstalk\Pheanstalk;
 
@@ -15,6 +15,22 @@ class NotifyTask extends Task
      * @var Job
      */
     protected $job;
+
+    /**
+     * @var Logger
+     */
+    protected $logger;
+
+    /**
+     * @param Logger $logger
+     *
+     * @return NotifyTask
+     */
+    public function setLogger(Logger $logger): NotifyTask
+    {
+        $this->logger = $logger;
+        return $this;
+    }
 
     /**
      * @param array $params
@@ -28,15 +44,15 @@ class NotifyTask extends Task
         try {
             $status = $this->isSent($params['user_id']);
             if ($status['mobile'] === false) {
-                $this->log('Sending mobile push to ' . $params['email']. ' 
-                for these cities: '.json_encode($params['city']));
+                $this->logger->debug('Sending mobile push to ' . $params['email'] . ' 
+                for these cities: ' . json_encode($params['city']));
                 $this->markSent($params['user_id'], 'mobile');
             } else {
-                $this->log('Already sent mobile push to ' . $params['email']);
+                $this->logger->debug('Already sent mobile push to ' . $params['email']);
             }
             return true;
         } catch (Exception $e) {
-            $this->log('Task failed: ' . $e->getMessage());
+            $this->logger->debug('Task failed: ' . $e->getMessage());
             return false;
         }
     }
@@ -53,15 +69,15 @@ class NotifyTask extends Task
         try {
             $status = $this->isSent($params['user_id']);
             if ($status['email'] === false) {
-                $this->log('Sending email to ' . $params['email']. ' 
-                for these cities: '.json_encode($params['city']));
+                $this->logger->debug('Sending email to ' . $params['email'] . ' 
+                for these cities: ' . json_encode($params['city']));
                 $this->markSent($params['user_id'], 'email');
             } else {
-                $this->log('Already sent email to ' . $params['email']);
+                $this->logger->debug('Already sent email to ' . $params['email']);
             }
             return true;
         } catch (Exception $e) {
-            $this->log('Task failed: ' . $e->getMessage());
+            $this->logger->debug('Task failed: ' . $e->getMessage());
             return false;
         }
     }
@@ -75,7 +91,7 @@ class NotifyTask extends Task
     public function subscriberAction(array $params, Job $job)
     {
         $this->job = $job;
-        $this->log('Task in progress');
+        $this->logger->debug('Task in progress');
         try {
             /**
              * @var GenericProvider $client
@@ -86,7 +102,7 @@ class NotifyTask extends Task
             /**
              * @var Pheanstalk $queue
              */
-            $queue  = $this->getDI()->get('queue');
+            $queue = $this->getDI()->get('queue');
 
             $collection   = $this->getUsers($client, $token, $params);
             $limit        = 2;
@@ -105,7 +121,7 @@ class NotifyTask extends Task
                     );
 
                     $queue->useTube('notification')->put($data);
-                    $this->log('Daily mobile push task registered for ' . $user['email']);
+                    $this->logger->debug('Daily mobile push task registered for ' . $user['email']);
 
                     $data = json_encode(
                         [
@@ -114,7 +130,7 @@ class NotifyTask extends Task
                         ]
                     );
                     $queue->useTube('email')->put($data);
-                    $this->log('Daily email push task registered for ' . $user['email']);
+                    $this->logger->debug('Daily email push task registered for ' . $user['email']);
                 }
 
                 $current_page++;
@@ -122,36 +138,9 @@ class NotifyTask extends Task
 
             return true;
         } catch (Exception $e) {
-            $this->log('Task failed: ' . $e->getMessage());
+            $this->logger->debug('Task failed: ' . $e->getMessage());
             return false;
         }
-    }
-
-    /**
-     * @param     $message
-     * @param int $level
-     */
-    private function log($message, int $level = Logger::INFO)
-    {
-        $loggy      = [
-            Logger::CRITICAL => 'CRITICAL',
-            Logger::ALERT    => 'ALERT',
-            Logger::ERROR    => 'ERROR',
-            Logger::WARNING  => 'WARNING',
-            Logger::NOTICE   => 'NOTICE',
-            Logger::INFO     => 'INFO',
-            Logger::DEBUG    => 'DEBUG',
-            Logger::CUSTOM   => 'CUSTOM',
-        ];
-        $jobId      = $this->job->getId();
-        $timeString = date('Y-m-d H:i:s');
-        $data       = json_decode($this->job->getData(), true);
-        $message    = "[{$loggy[$level]}] [{$timeString} QueueJob: {$jobId} Handle: {$data['job']}] {$message}";
-        if (!empty($this->logger)) {
-            $this->logger->log(1, $message);
-        }
-
-        echo $message . PHP_EOL;
     }
 
     /**
@@ -216,7 +205,7 @@ class NotifyTask extends Task
      */
     protected function markSent($user_id, string $type)
     {
-        $this->log('User ' . $type . ' notification marking at service');
+        $this->logger->debug('User ' . $type . ' notification marking at service');
 
         /**
          * @var GenericProvider $client
