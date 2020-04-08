@@ -144,8 +144,15 @@ class Notify
 
     public function run(): void
     {
-        $this->console('Notify is running!');
+        $this->console('Notify is running! ['. date_create('Y-m-d H:i:s').']');
+        /**
+         * @var \Monolog\Logger $logger
+         */
+        $logger = $this->di->get('logger');
+
         while (true) {
+            $logger->error('Test');
+
             try {
                 $this->job = $this->queue->reserveWithTimeout(10);
 
