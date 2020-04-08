@@ -3,7 +3,6 @@
 namespace Foreweather;
 
 use Exception;
-use League\OAuth2\Client\Provider\GenericProvider;
 use Phalcon\Cli\TaskInterface;
 use Phalcon\Di\FactoryDefault\Cli as FactoryDefault;
 use Phalcon\Di\ServiceProviderInterface;
@@ -144,7 +143,7 @@ class Notify
 
     public function run(): void
     {
-        $this->console('Notify is running! ['. date_create('Y-m-d H:i:s').']');
+        $this->console('Notify is running! [' . date_create('now')->format('Y-m-d H:i:s') . ']');
         /**
          * @var \Monolog\Logger $logger
          */
