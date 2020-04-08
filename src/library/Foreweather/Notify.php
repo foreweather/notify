@@ -3,13 +3,12 @@
 namespace Foreweather;
 
 use Exception;
+use Monolog\Logger;
 use Phalcon\Cli\TaskInterface;
 use Phalcon\Di\FactoryDefault\Cli as FactoryDefault;
 use Phalcon\Di\ServiceProviderInterface;
-use Phalcon\Logger;
 use Pheanstalk\Job;
 use Pheanstalk\Pheanstalk;
-use Psr\Log\LoggerInterface;
 
 class Notify
 {
@@ -34,7 +33,7 @@ class Notify
     protected $job;
 
     /**
-     * @var LoggerInterface
+     * @var Logger
      */
     protected $logger;
 
@@ -60,6 +59,8 @@ class Notify
 
         $this->registerServices();
 
+        $this->logger = $this->di->get('logger');
+
         $this->queue = $this->di->get('queue');
         $this->queue->watch('email');
         $this->queue->watch('notification');
@@ -82,28 +83,15 @@ class Notify
     }
 
     /**
-     * @param     $message
-     * @param int $level
+     * @param string $message
      */
-    private function log($message, int $level = Logger::INFO)
+    private function log($message)
     {
-        $loggy      = [
-            Logger::CRITICAL => 'CRITICAL',
-            Logger::ALERT    => 'ALERT',
-            Logger::ERROR    => 'ERROR',
-            Logger::WARNING  => 'WARNING',
-            Logger::NOTICE   => 'NOTICE',
-            Logger::INFO     => 'INFO',
-            Logger::DEBUG    => 'DEBUG',
-            Logger::CUSTOM   => 'CUSTOM',
-        ];
-        $timeString = date('Y-m-d H:i:s');
-        $message    = "[{$loggy[$level]}] [{$timeString}] {$message}";
         if (!empty($this->logger)) {
-            $this->logger->log(1, $message);
+            $this->logger->debug($message);
+        } else {
+            echo $message . PHP_EOL;
         }
-
-        echo $message . PHP_EOL;
     }
 
     /**
@@ -144,13 +132,11 @@ class Notify
     public function run(): void
     {
         $this->console('Notify is running! [' . date_create('now')->format('Y-m-d H:i:s') . ']');
-        /**
-         * @var \Monolog\Logger $logger
-         */
-        $logger = $this->di->get('logger');
+
 
         while (true) {
-            $logger->error('Test');
+            $this->log('Test inline log.');
+            $this->logger->error('Test logger error log.');
 
             try {
                 $this->job = $this->queue->reserveWithTimeout(10);
@@ -167,13 +153,13 @@ class Notify
                         $this->queue->delete($this->job);
                         $this->shouldClose();
                     } else {
-                        $this->log("Task buried");
+                        $this->logger->error("Task buried because could not success.");
                         $this->queue->bury($this->job);
                         continue;
                     }
                 }
             } catch (Exception $e) {
-                $this->log("Task failed and buried: " . $e->getMessage());
+                $this->logger->error("Task failed and buried: " . $e->getMessage());
                 $this->queue->bury($this->job);
                 continue;
             }
