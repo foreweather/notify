@@ -66,7 +66,7 @@ class LoggerProvider implements ServiceProviderInterface
                 $logger = new Logger('notify-logger');
                 $logger->pushHandler($sys_log);
                 $logger->pushHandler($stream_handler);
-                $logger->pushHandler(new StreamHandler('php://stdout', Logger::WARNING));
+                $logger->pushHandler(new StreamHandler('php://stdout', Logger::DEBUG));
 
                 return $logger;
             }
