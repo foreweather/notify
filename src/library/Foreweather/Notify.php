@@ -83,18 +83,6 @@ class Notify
     }
 
     /**
-     * @param string $message
-     */
-    private function log($message)
-    {
-        if (!empty($this->logger)) {
-            $this->logger->debug($message);
-        } else {
-            echo $message . PHP_EOL;
-        }
-    }
-
-    /**
      * @param $job_request
      *
      * @return array
@@ -121,21 +109,13 @@ class Notify
         return call_user_func_array([$this->di[$segments[0]], $segments[1]], [$data, $this->job]);
     }
 
-    /**
-     * @param string $message
-     */
-    public function console(string $message)
-    {
-        echo $message . PHP_EOL;
-    }
-
     public function run(): void
     {
-        $this->console('Notify is running! [' . date_create('now')->format('Y-m-d H:i:s') . ']');
+        $this->logger->debug('Notify is running! [' . date_create('now')->format('Y-m-d H:i:s') . ']');
 
 
         while (true) {
-            $this->log('Test inline log.');
+            $this->logger->debug('Test inline log.');
             $this->logger->error('Test logger error log.');
 
             try {
@@ -149,7 +129,7 @@ class Notify
                     }
 
                     if ($this->handle($segments, $data['payload'])) {
-                        $this->log("Task completed!");
+                        $this->logger->debug("Task completed!");
                         $this->queue->delete($this->job);
                         $this->shouldClose();
                     } else {
