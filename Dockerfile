@@ -20,7 +20,7 @@ ENV LOG_LEVEL           notice
 ENV SYSLOG_FACILITY     daemon
 ENV SYSLOG_IDENT        php-fpm
 
-RUN apk --update add bash git curl php7-fpm php7-phalcon php7-phar php7-openssl php7-json \
+RUN apk --update add bash git curl php7-sockets php7-fpm php7-phalcon php7-phar php7-openssl php7-json \
                  php7-gd php7-memcached php7-session php7-curl php7-pdo php7-pdo_mysql php7-tokenizer \
                  && rm -rf /var/cache/apk/*
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
